@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMatch - Movie Recommendations</title>
+    <style>
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 0;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 30px;
+        }
+
+        .search-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .search-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .genre-select {
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: white;
+            min-width: 150px;
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .movie-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .movie-poster {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #f0f2f5, #e2e8f0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            position: relative;
+        }
+
+        .movie-info {
+            padding: 20px;
+        }
+
+        .movie-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #2d3748;
+        }
+
+        .movie-genre {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .movie-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .stars {
+            color: #fbbf24;
+        }
+
+        .movie-description {
+            color: #64748b;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .movie-year {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .rating-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .imdb-rating {
+            background: #f59e0b;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .imdb-rating:hover {
+            background: #d97706;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
+        }
+
+        .watchlist-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .watchlist-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .watchlist-btn.added {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .watchlist-btn.added:hover {
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .trailer-btn {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            width: 100%;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .trailer-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        .recommendations-section {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .filter-chips {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .chip {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .chip:hover, .chip.active {
+            background: white;
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .search-container {
+                flex-direction: column;
+            }
+            
+            .search-input, .genre-select, .search-btn {
+                width: 100%;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .movies-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🎬 CineMatch</div>
+            <div class="tagline">Discover your next favorite movie</div>
+        </div>
+
+        <div class="search-section">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Search for movies, actors, or directors..." id="searchInput">
+                <select class="genre-select" id="genreSelect">
+                    <option value="">All Genres</option>
+                    <option value="action">Action</option>
+                    <option value="comedy">Comedy</option>
+                    <option value="drama">Drama</option>
+                    <option value="horror">Horror</option>
+                    <option value="romance">Romance</option>
+                    <option value="sci-fi">Sci-Fi</option>
+                    <option value="thriller">Thriller</option>
+                    <option value="bollywood">Bollywood</option>
+                </select>
+                <button class="search-btn" onclick="searchMovies()">Search</button>
+            </div>
+            
+            <div class="filter-chips">
+                <div class="chip active" onclick="filterMovies('trending')">🔥 Trending</div>
+                <div class="chip" onclick="filterMovies('top-rated')">⭐ Top Rated</div>
+                <div class="chip" onclick="filterMovies('new-releases')">🆕 New Releases</div>
+                <div class="chip" onclick="filterMovies('classics')">🏆 Classics</div>
+                <div class="chip" onclick="filterMovies('bollywood')">🎭 Bollywood</div>
+                <div class="chip" onclick="filterMovies('watchlist')">📋 My Watchlist</div>
+            </div>
+        </div>
+
+        <div class="recommendations-section">
+            <h2 class="section-title">Recommended for You</h2>
+            <div class="movies-grid" id="moviesGrid">
+                <!-- Movies will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const movies = [
+            {
+                id: 1,
+                title: "The Quantum Paradox",
+                genre: "Sci-Fi",
+                year: 2024,
+                rating: 4.8,
+                imdbRating: 8.7,
+                description: "A mind-bending journey through parallel dimensions where reality itself becomes questionable.",
+                emoji: "🚀",
+                category: "trending",
+                trailerUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                imdbUrl: "https://www.imdb.com/title/tt0111161/"
+            },
+            {
+                id: 2,
+                title: "Midnight in Paris",
+                genre: "Romance",
+                year: 2011,
+                rating: 4.6,
+                imdbRating: 7.7,
+                description: "A charming tale of love and nostalgia set against the backdrop of the City of Light.",
+                emoji: "🌙",
+                category: "classics",
+                trailerUrl: "https://www.youtube.com/watch?v=FAfR8omt-CY",
+                imdbUrl: "https://www.imdb.com/title/tt1605783/"
+            },
+            {
+                id: 3,
+                title: "The Last Heist",
+                genre: "Action",
+                year: 2023,
+                rating: 4.4,
+                imdbRating: 7.2,
+                description: "An adrenaline-pumping thriller about the perfect crime that goes perfectly wrong.",
+                emoji: "💎",
+                category: "trending",
+                trailerUrl: "https://www.youtube.com/watch?v=BIhNsAtPbPI",
+                imdbUrl: "https://www.imdb.com/title/tt1375666/"
+            },
+            {
+                id: 4,
+                title: "Echoes of Tomorrow",
+                genre: "Drama",
+                year: 2024,
+                rating: 4.9,
+                imdbRating: 9.1,
+                description: "A powerful story about family, sacrifice, and the choices that define our future.",
+                emoji: "🎭",
+                category: "top-rated",
+                trailerUrl: "https://www.youtube.com/watch?v=L_jWHffIx5E",
+                imdbUrl: "https://www.imdb.com/title/tt0068646/"
+            },
+            {
+                id: 5,
+                title: "Cosmic Comedy",
+                genre: "Comedy",
+                year: 2024,
+                rating: 4.2,
+                imdbRating: 6.8,
+                description: "Hilarious adventures of unlikely heroes saving the galaxy one laugh at a time.",
+                emoji: "😂",
+                category: "new-releases",
+                trailerUrl: "https://www.youtube.com/watch?v=kJQP7kiw5Fk",
+                imdbUrl: "https://www.imdb.com/title/tt0110912/"
+            },
+            {
+                id: 6,
+                title: "Shadow's Edge",
+                genre: "Thriller",
+                year: 2023,
+                rating: 4.7,
+                imdbRating: 8.3,
+                description: "A psychological thriller that will keep you guessing until the very last scene.",
+                emoji: "🔍",
+                category: "trending",
+                trailerUrl: "https://www.youtube.com/watch?v=hFZFjoX2cGg",
+                imdbUrl: "https://www.imdb.com/title/tt0137523/"
+            },
+            {
+                id: 7,
+                title: "The Artist's Dream",
+                genre: "Drama",
+                year: 1998,
+                rating: 4.5,
+                imdbRating: 8.0,
+                description: "An inspiring story of creativity, passion, and the pursuit of artistic excellence.",
+                emoji: "🎨",
+                category: "classics",
+                trailerUrl: "https://www.youtube.com/watch?v=djV11Xbc914",
+                imdbUrl: "https://www.imdb.com/title/tt0109830/"
+            },
+            {
+                id: 8,
+                title: "Neon Nights",
+                genre: "Action",
+                year: 2024,
+                rating: 4.3,
+                imdbRating: 7.5,
+                description: "High-octane action in a cyberpunk world where technology and humanity collide.",
+                emoji: "⚡",
+                category: "new-releases",
+                trailerUrl: "https://www.youtube.com/watch?v=YQHsXMglC9A",
+                imdbUrl: "https://www.imdb.com/title/tt0468569/"
+            },
+            // Bollywood Movies
+            {
+                id: 9,
+                title: "3 Idiots",
+                genre: "Bollywood",
+                year: 2009,
+                rating: 4.9,
+                imdbRating: 8.4,
+                description: "Two friends search for their long-lost companion who inspired them to think differently.",
+                emoji: "🎓",
+                category: "bollywood",
+                trailerUrl: "https://www.youtube.com/watch?v=K0eDlFX9GMc",
+                imdbUrl: "https://www.imdb.com/title/tt1187043/"
+            },
+            {
+                id: 10,
+                title: "Dangal",
+                genre: "Bollywood",
+                year: 2016,
+                rating: 4.8,
+                imdbRating: 8.3,
+                description: "A former wrestler trains his daughters to become world-class wrestlers.",
+                emoji: "💪",
+                category: "bollywood",
+                trailerUrl: "https://www.youtube.com/watch?v=x_7YlGv9u1g",
+                imdbUrl: "https://www.imdb.com/title/tt5074352/"
+            },
+            {
+                id: 11,
+                title: "Lagaan",
+                genre: "Bollywood",
+                year: 2001,
+                rating: 4.7,
+                imdbRating: 8.1,
+                description: "Villagers challenge British officers to a cricket match to avoid oppressive taxes.",
+                emoji: "🏏",
+                category: "bollywood",
+                trailerUrl: "https://www.youtube.com/watch?v=1c6pVlT0eKY",
+                imdbUrl: "https://www.imdb.com/title/tt0169102/"
+            },
+            {
+                id: 12,
+                title: "Zindagi Na Milegi Dobara",
+                genre: "Bollywood",
+                year: 2011,
+                rating: 4.6,
+                imdbRating: 8.2,
+                description: "Three friends take a road trip to Spain and rediscover their friendship.",
+                emoji: "✈️",
+                category: "bollywood",
+                trailerUrl: "https://www.youtube.com/watch?v=8BTZC9y4_To",
+                imdbUrl: "https://www.imdb.com/title/tt1562872/"
+            },
+            {
+                id: 13,
+                title: "Gully Boy",
+                genre: "Bollywood",
+                year: 2019,
+                rating: 4.5,
+                imdbRating: 8.0,
+                description: "A street rapper from Mumbai strives to make it big in the hip-hop scene.",
+                emoji: "🎤",
+                category: "bollywood",
+                trailerUrl: "https://www.youtube.com/watch?v=JfbxcD6biOk",
+                imdbUrl: "https://www.imdb.com/title/tt2395469/"
+            },
+            {
+                id: 14,
+                title: "Andhadhun",
+                genre: "Bollywood",
+                year: 2018,
+                rating: 4.7,
+                imdbRating: 8.2,
+                description: "A blind pianist gets entangled in a series of mysterious events.",
+                emoji: "🎹",
+                category: "bollywood",
+                trailerUrl: "https://www.youtube.com/watch?v=2iVYI99VGaw",
+                imdbUrl: "https://www.imdb.com/title/tt8108198/"
+            },
+            {
+                id: 15,
+                title: "Queen",
+                genre: "Bollywood",
+                year: 2013,
+                rating: 4.6,
+                imdbRating: 8.2,
+                description: "A woman embarks on her honeymoon alone after her fiancé calls off their wedding.",
+                emoji: "👑",
+                category: "bollywood",
+                trailerUrl: "https://www.youtube.com/watch?v=KGC6vl3l7fQ",
+                imdbUrl: "https://www.imdb.com/title/tt3322420/"
+            },
+            {
+                id: 16,
+                title: "PK",
+                genre: "Bollywood",
+                year: 2014,
+                rating: 4.5,
+                imdbRating: 8.1,
+                description: "An alien questions religious dogmas after being stranded on Earth.",
+                emoji: "👽",
+                category: "bollywood",
+                trailerUrl: "https://www.youtube.com/watch?v=82ZED7G5yyY",
+                imdbUrl: "https://www.imdb.com/title/tt2338151/"
+            }
+        ];
+
+        let watchlist = JSON.parse(localStorage.getItem('movieWatchlist')) || [];
+
+        let currentFilter = 'trending';
+        let filteredMovies = movies;
+
+        function renderMovies(moviesToRender) {
+            const grid = document.getElementById('moviesGrid');
+            grid.innerHTML = moviesToRender.map(movie => `
+                <div class="movie-card">
+                    <div class="movie-poster" onclick="showMovieDetails('${movie.title}')">
+                        ${movie.emoji}
+                    </div>
+                    <div class="movie-info">
+                        <div class="movie-title" onclick="showMovieDetails('${movie.title}')">${movie.title}</div>
+                        <div class="movie-year">${movie.year}</div>
+                        <div class="movie-genre">${movie.genre}</div>
+                        <div class="rating-container">
+                            <div class="movie-rating">
+                                <span class="stars">${'⭐'.repeat(Math.floor(movie.rating))}</span>
+                                <span>${movie.rating}/5</span>
+                            </div>
+                            <a href="${movie.imdbUrl}" target="_blank" class="imdb-rating">IMDb ${movie.imdbRating}</a>
+                        </div>
+                        <div class="movie-description">${movie.description}</div>
+                        <button class="trailer-btn" onclick="watchTrailer('${movie.trailerUrl}')">
+                            🎬 Watch Trailer
+                        </button>
+                        <button class="watchlist-btn ${watchlist.includes(movie.id) ? 'added' : ''}" 
+                                onclick="toggleWatchlist(${movie.id})">
+                            ${watchlist.includes(movie.id) ? '❤️ Remove from Watchlist' : '➕ Add to Watchlist'}
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterMovies(category) {
+            currentFilter = category;
+            
+            // Update active chip
+            document.querySelectorAll('.chip').forEach(chip => chip.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Filter movies
+            if (category === 'watchlist') {
+                filteredMovies = movies.filter(movie => watchlist.includes(movie.id));
+            } else {
+                filteredMovies = movies.filter(movie => movie.category === category);
+            }
+            
+            renderMovies(filteredMovies);
+            
+            // Update section title
+            const sectionTitle = document.querySelector('.section-title');
+            if (category === 'watchlist') {
+                sectionTitle.textContent = `My Watchlist (${filteredMovies.length} movies)`;
+            } else {
+                sectionTitle.textContent = 'Recommended for You';
+            }
+        }
+
+        function toggleWatchlist(movieId) {
+            const index = watchlist.indexOf(movieId);
+            
+            if (index === -1) {
+                // Add to watchlist
+                watchlist.push(movieId);
+            } else {
+                // Remove from watchlist
+                watchlist.splice(index, 1);
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('movieWatchlist', JSON.stringify(watchlist));
+            
+            // Re-render movies to update button states
+            renderMovies(filteredMovies);
+            
+            // If currently viewing watchlist, update the filter
+            if (currentFilter === 'watchlist') {
+                filteredMovies = movies.filter(movie => watchlist.includes(movie.id));
+                renderMovies(filteredMovies);
+                document.querySelector('.section-title').textContent = `My Watchlist (${filteredMovies.length} movies)`;
+            }
+        }
+
+        function searchMovies() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const selectedGenre = document.getElementById('genreSelect').value.toLowerCase();
+            
+            let results = movies;
+            
+            if (searchTerm) {
+                results = results.filter(movie => 
+                    movie.title.toLowerCase().includes(searchTerm) ||
+                    movie.description.toLowerCase().includes(searchTerm) ||
+                    movie.genre.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            if (selectedGenre) {
+                results = results.filter(movie => 
+                    movie.genre.toLowerCase().includes(selectedGenre)
+                );
+            }
+            
+            filteredMovies = results;
+            renderMovies(filteredMovies);
+            
+            // Update section title
+            const sectionTitle = document.querySelector('.section-title');
+            if (searchTerm || selectedGenre) {
+                sectionTitle.textContent = `Search Results (${results.length} movies)`;
+            } else {
+                sectionTitle.textContent = 'Recommended for You';
+            }
+        }
+
+        function watchTrailer(trailerUrl) {
+            window.open(trailerUrl, '_blank', 'noopener,noreferrer');
+        }
+
+        function showMovieDetails(title) {
+            const movie = movies.find(m => m.title === title);
+            const isInWatchlist = watchlist.includes(movie.id);
+            alert(`🎬 ${movie.title} (${movie.year})\n\n📝 ${movie.description}\n\n⭐ User Rating: ${movie.rating}/5\n🏆 IMDb Rating: ${movie.imdbRating}/10\n🎭 Genre: ${movie.genre}\n📋 Watchlist: ${isInWatchlist ? 'Added ✓' : 'Not added'}\n🎬 Trailer: Available\n\nClick "Use in a design" to add this movie recommendation system to your Canva project!`);
+        }
+
+        // Handle Enter key in search input
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchMovies();
+            }
+        });
+
+        // Initialize with trending movies
+        filterMovies('trending');
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9878fbbc039d3a5d',t:'MTc1OTI5MDQ5NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
